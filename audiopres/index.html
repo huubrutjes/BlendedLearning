@@ -9,7 +9,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 <script src="scripts/jquery.csv.min.js"></script>  
 <script>
-    var stage;
     var slides = [];
     var currentSlide = 1;
     var nextBtn;
@@ -22,15 +21,7 @@
     var omittedSlides=[];
     var nrOfSlides = 0;
     function Init(){
-        //Create a stage by getting a reference to the canvas
-//        canvas = document.createElement("canvas");
-        stage = new createjs.Stage("canvas");
-//        stage.enableMouseOver(10);
-        
-        
-    
-           
-        
+       
         //LOAD SETTINGS
         $.ajax({
             url: "settings.csv",
@@ -43,6 +34,7 @@
         }
         });
         
+        //Default settings
         settings = { 
             WIDTH: 800,
             HEIGHT: 450,
@@ -51,7 +43,7 @@
             IMGTYPE: "svg"
         }
         
-        
+        //Set parameters
         for(var i in data){
             var temp = data[i][1];
             switch(data[i][0]){
@@ -78,6 +70,7 @@
         
         nrOfSlides = settings.NROFSLIDES - omittedSlides.length;
         
+        //load slide filenames
         slideSrc = [];
         for(var i=1;i<settings.NROFSLIDES+1;i++){
             if(!include(omittedSlides,i)){
@@ -86,12 +79,9 @@
             
         }
         
-//        console.log(include(omittedSlides,2));
-        
-        
-        
         //create all the elements
         
+        //container for everything
         container = document.createElement("div");
         container.className = "container";
         container.style.width = settings.WIDTH +"px";
@@ -105,12 +95,11 @@
         slideFrame.style.width = settings.WIDTH + "px";
         slideFrame.style.height = settings.HEIGHT + "px";
         
+        //title text
         titleDiv = document.createElement("div");
         titleDiv.innerHTML = settings.TITLE;
         titleDiv.className = "title";
         container.appendChild(titleDiv);
-        
-        
 
         //create DIV for controls
         controlDiv = document.createElement('div');
@@ -144,6 +133,7 @@
         pauseBtn.style.float = "left";
         controlDiv.appendChild(pauseBtn);
         
+        //create autoplay button
         autoPlayButton = document.createElement("button");
         var t = document.createTextNode("A");
         autoPlayButton.appendChild(t);
@@ -151,11 +141,12 @@
         autoPlayButton.style.float = "left";
         controlDiv.appendChild(autoPlayButton);
         
+        //create container for timeline
         timeline = document.createElement('div');
         timeline.className = "timeline";
         controlDiv.appendChild(timeline);
         
-        //
+        //create start button
         startBtn = document.createElement("button");
         startBtn.className = "start";
         var t = document.createTextNode("START");
@@ -169,6 +160,7 @@
             Start();
         }
         
+        //create startbutton for no sound play
         startNoSoundBtn = document.createElement("button");
         startNoSoundBtn.className = "start";
         var t = document.createTextNode("without sound");
@@ -184,11 +176,6 @@
             container.removeChild(titleDiv);
             Start();
         }
-        
-        
-        
-        
-        
     }
     
     function include(arr,obj) {
@@ -228,13 +215,7 @@
             }
             document.onkeydown = KeyPressed;
             ChangeSlide(0);
-        }
-            
-        
-        
-//        container.onkeydown = KeyPressed;
-//        slideFrame.onkeydown = KeyPressed;
-
+        }        
     }
     
     function Pad(nr) {
@@ -242,7 +223,6 @@
     }
     
     function loadSound(event){
-        
         var i=event.id.slice(-2) - 1;
         CreateSlideButton(i);
 
@@ -263,12 +243,9 @@
             document.onkeydown = KeyPressed;
             createjs.Ticker.addEventListener("tick", AdvancePlayhead);
         }
-
     }
     
     function CreateSlideButton(i){
-        
-        
         timelineSlides[i]= document.createElement("button");
         timelineSlides[i].className = "timelineSlide";
         var t = document.createTextNode(i+1);
@@ -282,19 +259,11 @@
         timeline.appendChild(timelineSlides[i]);
     }
     
-//        
-        
-
-    
     function ChangeSlide(dn) {
         
         for(var i in timelineSlides){
             timelineSlides[i].style.color = "black";
         }
-        
-        
-
-        
         if(dn==1 && currentSlide<nrOfSlides) {
             currentSlide++;
         }
@@ -302,8 +271,7 @@
             currentSlide--;
         }
         timelineSlides[currentSlide-1].style.color = "white";
-        
-                
+  
         if(currentSlide==1) {
             prevBtn.className = "navDisabled";
         } else {
@@ -373,8 +341,6 @@
             // space bar
             Pause();
         }
-        
-        
     } 
     
     function Pause(){
@@ -385,28 +351,15 @@
                     pauseBtn.style.color = "black";
                 }
             }
-    
-    
+
     function handleInteraction(event) {
 		    event.target.alpha = (event.type == "mouseover") ? 1 : 0.5;
 		}
-        
-    
 
 </script>    
     
 </head>
-    
-    
-    
-<body onload="Init();">
-   
-    <canvas id="canvas"></canvas>
-    
-    
-</body>
-    
-    
-    
+
+<body onload="Init();"></body>
 </html>
 
