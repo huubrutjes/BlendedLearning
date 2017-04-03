@@ -1,0 +1,203 @@
+<html>
+<head>
+  <title>Example</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>
+   <link rel='stylesheet' type='text/css' href='https://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css' />
+
+
+   <script type="text/x-mathjax-config">
+			MathJax.Hub.Config({
+			tex2jax: {
+			inlineMath: [["$","$"],["\\(","\\)"]]
+			}
+			});
+	</script>
+	<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+	<style>
+
+		body {
+			background:#FFFFFF;
+			padding:0;
+			margin:0;
+			overflow:hidden;
+			}
+
+		div.chartLeft {
+			width: 350px;
+			height: 350px;
+			position: absolute;
+			top: 50px;
+			left: 0px;
+			display: inline-block;
+		}
+		div.chartRight {
+			width: 350px;
+			height: 350px;
+			position: absolute;
+			top: 50px;
+			left: 100px;
+			display: inline-block;
+		}
+		div.slider {
+			width: 500px;
+			height: 500px;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			display: inline-block;
+		}
+		div.labelLeft {
+			width: 350px;
+			height: 50px;
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			text-align: center;
+			display: inline-block;
+			line-height: 50px;
+			font-size: 25px
+;		}
+		button  {
+		    background-color: #ffffff;
+		    border: 3px solid black;
+		    border-radius: 10px;
+		    color: black;
+		    width: 90px;
+		    padding: 10px;
+		    height: 90px;
+		    top: 50px;
+		    left: 350px;
+		    text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    font-size: 14px;
+		    position: absolute;
+		    vertical-align: middle;
+}
+	
+
+	</style>
+
+</head>
+<body>
+
+
+<div class="labelLeft">State before measurement</div>
+<div class="labelLeft" style="left:450px">State after measurement</div>
+
+<div id="slider" class="slider" ></div>
+<div id="chartLeft" class="chartLeft" ></div>
+<div id="chartRight" class="chartRight" ></div>
+
+<button id="measure1" type="BUTTON" class="measure" onclick="Measure(1)">MEASURE 1</button>
+<button id="measure10" type="BUTTON" class="measure" onclick="Measure(10)" style="top:150px">MEASURE 10</button>
+<button id="reset" type="BUTTON" class="measure" onclick="Reset()" style="top:250px" >RESET COUNT</button>
+
+<script type="text/javascript">
+
+	var measurement = [0.,0.];
+	var measScaled = [0.,0.];
+	var n = 0;
+	var cumulative = false;
+
+ 	
+    var boardLeft = JXG.JSXGraph.initBoard('chartLeft', {showNavigation:false, showCopyright:false, boundingbox: [0, 1,3, -1]});
+    boardLeft.containerObj.style.backgroundColor = 'white';
+    boardLeft.options.label.strokeColor = 'black';
+    boardLeft.suspendUpdate();
+	var psi = boardLeft.create('slider',[[0.5,-0.5],[2.5,-0.5],[0,0.2,Math.PI/2]],{size:20}); 
+    var dataArr = [function(){return Math.cos(psi.Value());},function(){return Math.sin(psi.Value());}];
+
+    var chartLeft = boardLeft.createElement('chart', [dataArr], 
+        {chartStyle:'bar',  
+         colors:['#ff0000','#0000ff'],
+         width: 1,
+         fillOpacity:1, 
+         center:[1,0], 
+         strokeColor:'black', 
+         highlightStrokeColor:'black', 
+         strokeWidth:4,
+         labels:['Left','Right'],
+         highlightColors:['#ff0000','#0000ff'],
+         highlightOnSector:true, 
+         highlightBySize:true,
+         // gradient:'linear'
+        }
+    );
+
+    txtState = boardLeft.create('text',[0.1,-0.2, "$|\\\\psi \\\\rangle = $"], {fontSize:20});
+	txtLeft = boardLeft.create('text',[0.7,-0.2, function(){return Math.round(Math.cos(psi.Value())*100)/100 ;}], {fontSize:20});
+	txtL = boardLeft.create('text',[1.1,-0.2, "$|0 \\\\rangle + $"], {fontSize:20});
+	txtRight = boardLeft.create('text',[1.6,-0.2, function(){return Math.round(Math.sin(psi.Value())*100)/100 ;}], {fontSize:20});
+	txtR = boardLeft.create('text',[2,-0.2, "$|1 \\\\rangle$"], {fontSize:20});
+	// txtRight = boardLeft.create('text',[1.5,-0.2, function(){return "Right:  " + Math.round(Math.sin(psi.Value())*100)/100 ;}], {fontSize:30});
+
+    boardLeft.unsuspendUpdate();
+
+    var boardRight = JXG.JSXGraph.initBoard('chartRight', {showNavigation:false, showCopyright:false, boundingbox: [0, 1,3, -1]});
+    boardRight.containerObj.style.backgroundColor = 'white';
+    boardRight.options.label.strokeColor = 'black';
+    boardRight.suspendUpdate();
+	// var psi = boardRight.create('slider',[[1,-0.5],[2,-0.5],[0,0.2,1]],{size:20}); 
+    var measArr = [function(){return measScaled[0];},function(){return measScaled[1];}];
+
+    var chartRight = boardRight.createElement('chart', [measArr], 
+        {chartStyle:'bar',  
+         colors:['#ff0000','#0000ff'],
+         width: 1,
+         fillOpacity:1, 
+         center:[1,0], 
+         strokeColor:'black', 
+         highlightStrokeColor:'black', 
+         strokeWidth:4,
+         labels:['Left','Right'],
+         highlightColors:['#ff0000','#0000ff'],
+         highlightOnSector:true, 
+         highlightBySize:true,
+         // gradient:'linear'
+        }
+    );
+	txt1 = boardRight.create('text',[0.5,-0.2, function(){return "Left:  " + measurement[0];}], {fontSize:20});
+	txt2 = boardRight.create('text',[1.5,-0.2, function(){return "Right:  " + measurement[1];}], {fontSize:20});
+
+
+    boardRight.unsuspendUpdate();
+
+    function Measure(times) {
+
+    	for(var i=0 ; i<times ; i++){
+    		var diceThrow = Math.random();
+
+			if (diceThrow >= Math.pow(Math.sin(psi.Value()),2)) {
+				measurement[0] +=1.;
+				n+=1;
+			} else {
+				measurement[1] +=1.;
+				n+=1;
+			}
+		}
+			
+			
+
+		measScaled[0] = measurement[0] / Math.max(measurement[0],measurement[1]);
+		measScaled[1] = measurement[1] / Math.max(measurement[0],measurement[1]);
+
+		boardRight.update();
+    }
+
+    function Reset() {
+    	measScaled = [0,0];
+    	measurement = [0,0];
+    	boardRight.update();
+    }
+
+
+    
+
+</script>
+
+
+</body>
+</html>

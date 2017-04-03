@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset=utf-8>
+		<title>Interactive Bloch Sphere</title>
+		<script type="text/x-mathjax-config">
+			MathJax.Hub.Config({
+			tex2jax: {
+			inlineMath: [["$","$"],["\\(","\\)"]]
+			}
+			});
+			</script>
+			<script type="text/javascript" async
+					src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+			</script>
+		<style>
+			body {
+				background:#FFFFFF;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+			/*canvas { width: 80%; height: 80% }*/
+			#psi {
+				position: absolute;
+				bottom: 10px;
+				width: 800px;
+				text-align: center;
+				color: black;
+				font-size: 30pt;
+				z-index: 100;
+				display:block;
+			}
+
+
+			.state {
+				display: inline-block;
+				position: relative;
+				text-align: left;
+				width: 100px;
+				/*height: 10%;*/
+				/*margin: 10px;*/
+				/*font-size: 20pt;*/
+				/*border: 3px solid #73AD21;  */
+			}
+			.plus {
+				display: inline-block;
+				position: relative;
+				text-align: left;
+				width: 30px;
+				/*height: 10%;*/
+				/*margin: 10px;*/
+				/*font-size: 20pt;*/
+				/*border: 3px solid #73AD21;  */
+			}
+			.component {
+				display: inline-block;
+				position: relative;
+				text-align: right;
+				width: 80px;
+				/*height: 75px;*/
+				/*margin: 10px;*/
+				/*border: 3px solid #73AD21;  */
+			}
+			#angle {
+				position: absolute;
+				top: 100px;
+				width: 33%;
+				text-align: left;
+				color: black;
+				font-size: 15pt;
+				z-index: 100;
+				display:block;
+			}
+
+			button  {
+	   			background-color: rgba(255,255,255,0);	
+				border: 1px solid black;
+				border-radius: 10px;
+			    color: black;
+			    /*width: 200px;*/
+			    padding: 0px;
+			    margin: 0px;
+			    height: 25px;
+			    /*top: 0px;*/
+			    text-align: center;
+			    text-decoration: none;
+			    /*display: inline-block;*/
+			    font-size: 12px;
+			    position: relative;
+			    vertical-align: middle;
+			    display:inline-block;
+			}
+
+		</style>
+		
+	</head>
+	<body>
+		
+
+		<script src="../js/three.min.js"></script>
+		<script src="../js/OrbitControls.js"></script>
+		<script src="../js/OutlineEffect.js"></script>
+		<script src="../js/DragControls.js"></script>
+		<script src="../js/TrackballControls.js"></script>
+		<script src="../js/Projector.js"></script>
+		<script src="../js/dat.gui.js"></script>
+		<script src="../js/math.min.js"></script>
+
+		<div id="psi">
+			<div class="state">$|\psi\rangle = $</div>
+			<div id="state0_Re" class="component"></div>
+			<div class="state">$|0\rangle \; + \; ($</div>
+			<div id="state1_Re" class="component"></div>
+			<div class="plus">$+$</div>
+			<div id="state1_Im" class="component"></div>
+			<div class="state">$i)|1\rangle$</div>
+
+		</div>	
+
+		
+
+		<script>
+
+		
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+			var x,y,z,angle;
+			var state,psiGeo;
+			var container;
+			var camera, scene, controls, raycaster;
+			var renderer, effect;
+			var gui;
+			var mouse = new THREE.Vector2();
+			var coors = new THREE.Vector2();
+			var mouseDown = false;
+			var stateMove = false;
+			var objects = [];
+			var axesLabels = [];
+			
+
+
+			var loader = new THREE.FontLoader();
+			loader.load( 'https://threejs.org/examples/fonts/gentilis_regular.typeface.json', function ( font ) {
+				init( font );
+				animate();
+			} );
+			
+			function init(font){
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.style.width="600px";
+				container.style.height="600px";
+				container.style.position="absolute";
+				container.style.left="200px";
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true }  );
+				// renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setPixelRatio(1);
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+				// effect = new THREE.AnaglyphEffect( renderer, 0.1);
+				renderer.setSize( 600, 600 );
+
+				container.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 40, 1, 0.1, 100 );
+				camera.position.x = 3;
+				camera.position.z = -3;
+				camera.position.y = 3;
+				camera.focus = camera.position.length();
+				
+				camera.lookAt( scene.position );
+
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls.enabled = false;
+				// controls.addEventListener( 'change', render ); // remove when using animation
+				// controls.enableZoom = true;
+				
+				var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+				var material = new THREE.MeshToonMaterial( { 
+					color: 0xffffff,
+					specular: 0xffffff,
+					shading: THREE.SmoothShading,
+					shininess: 0,
+					reflectivity: 1
+					 } );
+				material.wireframe = false;
+				material.transparent = true;
+				material.opacity = 0.4;
+				var sphere = new THREE.Mesh( geometry, material );
+				scene.add( sphere );
+				// objects.push(sphere);
+				
+				//x-axis
+				var material = new THREE.LineBasicMaterial({ color: 0xFF0000 });
+				var geometry = new THREE.Geometry();
+				geometry.vertices.push(new THREE.Vector3(-2, 0, 0));
+				geometry.vertices.push(new THREE.Vector3(2, 0, 0));
+				var line = new THREE.Line(geometry, material);
+				scene.add(line);
+				//y-axis REMEMBER THAT Y AND Z ARE INTERCHANGED
+				var material = new THREE.LineBasicMaterial({ color: 0x00FF00 });
+				var geometry = new THREE.Geometry();
+				geometry.vertices.push(new THREE.Vector3(0, 0, -2));
+				geometry.vertices.push(new THREE.Vector3(0, 0, 2));
+				var line = new THREE.Line(geometry, material);
+				scene.add(line);
+				//z-axis REMEMBER THAT Y AND Z ARE INTERCHANGED
+				var material = new THREE.LineBasicMaterial({ color: 0x0000FF });
+				var geometry = new THREE.Geometry();
+				geometry.vertices.push(new THREE.Vector3(0, -2, 0));
+				geometry.vertices.push(new THREE.Vector3(0, 2, 0));
+				var line = new THREE.Line(geometry, material);
+				scene.add(line);
+
+				//Create state vector, first the sphere
+				var geometry = new THREE.SphereGeometry( 0.05, 32, 32 );
+				var material = new THREE.MeshToonMaterial( { color: 0xaaaaaa } );
+				state = new THREE.Mesh( geometry, material );
+				scene.add( state );
+				objects.push(state);
+				//Now the line
+				var material = new THREE.LineBasicMaterial({ color: 0x000000 ,linewidth: 1});
+				psiGeo = new THREE.Geometry();
+				
+				
+				psiGeo.vertices.push(new THREE.Vector3(0, 0, 0));
+				psiGeo.vertices.push(new THREE.Vector3(0.5, 0, 0));
+				psiGeo.dynamic = true;
+				psiGeo.verticesNeedUpdate = true;
+				var vector = new THREE.Line(psiGeo, material);
+				scene.add(vector);
+
+				function addLabel( name, location ) {
+					var textGeo = new THREE.TextGeometry( name, {
+						font: font,
+						size: 0.15,
+						height: 0,
+						curveSegments: 1
+					});
+					var textMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
+					var textMesh = new THREE.Mesh( textGeo, textMaterial );
+					textMesh.position.copy( location );
+					textMesh.lookAt(camera.position);
+					scene.add( textMesh );
+					axesLabels.push(textMesh);
+				}
+
+				addLabel( "x", new THREE.Vector3( 2, 0, 0 ) );
+				addLabel( "-x", new THREE.Vector3( -2, 0, 0 ) );
+				addLabel( "y", new THREE.Vector3( 0, 0, -2 ) );
+				addLabel( "-y", new THREE.Vector3( 0, 0, 2));
+				addLabel( "z", new THREE.Vector3( 0, 1.5, 0 ) );
+				addLabel( "-z", new THREE.Vector3( 0, -2, 0) );
+
+				var lightUp = new THREE.PointLight( 0xffffff, 1, 0 );
+				lightUp.position.set( 0, 10, 0 );
+				scene.add( lightUp );
+
+				var lightDown = new THREE.PointLight( 0x0000ff, 0, 100 );
+				lightDown.position.set( 0, -10, 0 );
+				scene.add( lightDown );
+
+				effect = new THREE.OutlineEffect( renderer );
+
+				raycaster = new THREE.Raycaster();
+
+
+				// var dragControls = new THREE.DragControls( objects, camera, renderer.domElement );
+				// dragControls.addEventListener( 'dragstart', function ( event ) { controls.enabled = false; } );
+				// dragControls.addEventListener( 'dragend', function ( event ) { controls.enabled = true; } );
+
+				params = {
+	 				theta: Math.PI/2,
+	 				phi:  0
+				}
+
+				gui = new dat.GUI();
+
+				gui.add(params, 'theta', 0,Math.PI).step(Math.PI/24).onChange( render );
+				gui.add(params, 'phi', 0,2*Math.PI).step(Math.PI/24).onChange( render );
+
+				gui.__controllers[0].listen();
+				gui.__controllers[1].listen();
+
+
+				// window.addEventListener( 'resize', onWindowResize, false );
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			}
+
+
+			
+			
+
+			function onWindowResize() {
+				// windowHalfX = window.innerWidth / 2;
+				// windowHalfY = window.innerHeight / 2;
+				// camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				render();
+			}
+
+			function CheckAngle(){
+				angle=0;
+
+				if(document.getElementById('halfturnP').checked){
+					angle=Math.PI/2;
+				} else if(document.getElementById('halfturnM').checked){
+					angle=-Math.PI/2;
+				} else if(document.getElementById('quarterturnP').checked){
+					angle=Math.PI/4;
+				} else if(document.getElementById('quarterturnM').checked){
+					angle=-Math.PI/4;
+				}
+			
+				return angle;
+			}
+
+			function SphericalToCartesian(Theta,Phi){
+				x = Math.sin(params.theta)*Math.cos(params.phi);
+				y = Math.sin(params.theta)*Math.sin(params.phi);
+				z = Math.cos(params.theta);
+
+				return [x,y,z];
+			}
+
+			function CartesianToSpherical(v){
+				var theta = Math.acos(v[2]);
+				var phi = Math.atan2(v[1],v[0]);
+
+				return [theta,phi];
+			}
+
+			function RotationX(v,angle) {
+				
+
+				return [v[0],v[1]*Math.cos(angle)-v[2]*Math.sin(angle),v[2]*Math.cos(angle)+v[1]*Math.sin(angle)];
+			}
+			
+			function RotationY(v,angle) {
+				
+
+				return [v[0]*Math.cos(angle)+v[2]*Math.sin(angle),v[1],v[2]*Math.cos(angle)-v[0]*Math.sin(angle)];
+			}
+
+			function RotationZ(v,angle) {
+				
+
+				return [v[0]*Math.cos(angle)-v[1]*Math.sin(angle),v[1]*Math.cos(angle)+v[0]*Math.sin(angle),v[2]];
+			}
+
+			function Rotation(axis,angle){
+				var coors = SphericalToCartesian(params.theta,params.phi);
+				if(axis==0){
+					var temp = RotationX(coors,angle);
+				}
+				else if(axis==1){
+					var temp = RotationY(coors,angle);
+				}
+				else if(axis==2){
+					var temp = RotationZ(coors,angle);
+				}
+				
+				newState = CartesianToSpherical(temp);
+				params.theta = newState[0];
+				params.phi = newState[1];
+			}
+
+			function Hadamard(){
+				var coors = SphericalToCartesian(params.theta,params.phi);
+				
+				var temp = RotationX(coors,-Math.PI/2);
+				temp = RotationZ(temp,-Math.PI/2);
+				temp = RotationX(temp,-Math.PI/2);
+
+				
+				newState = CartesianToSpherical(temp);
+				params.theta = newState[0];
+				params.phi = newState[1];
+				render();
+			}
+			
+			function Measure(axis){
+
+
+				var psiUp = math.complex(Math.cos(params.theta/2));
+				var psiDown = math.complex(Math.cos(-params.phi)*Math.sin(params.theta/2),Math.sin(-params.phi)*Math.sin(params.theta/2) );
+
+				var psi = [psiUp,psiDown];
+
+				var xUp = [math.complex(1/Math.SQRT2,0),math.complex(1/Math.SQRT2,0)];
+				var xDown = [math.complex(1/Math.SQRT2,0),math.complex(-1/Math.SQRT2,0)];
+				var yUp = [math.complex(1/Math.SQRT2,0),math.complex(0,1/Math.SQRT2)];
+				var yDown = [math.complex(1/Math.SQRT2,0),math.complex(0,-1/Math.SQRT2)];
+				var zUp = [math.complex(1,0),math.complex(0,0)];
+				var zDown = [math.complex(0,0),math.complex(1,0)];
+
+
+				
+
+				if(axis==0){
+					
+					var UP = math.pow(math.norm(math.dot(xUp,psi)),2);
+					var DOWN = math.pow(math.norm(math.dot(xDown,psi)),2);
+					var diceThrow = Math.random();
+
+					if (diceThrow >= DOWN) {
+						params.theta = Math.PI/2;
+						params.phi = 0;
+					} else {
+						params.theta = Math.PI/2;
+						params.phi = Math.PI;
+					}
+
+				}
+
+
+				if(axis==1){
+					
+					var UP = math.pow(math.norm(math.dot(yUp,psi)),2);
+					var DOWN = math.pow(math.norm(math.dot(yDown,psi)),2);
+					var diceThrow = Math.random();
+
+					if (diceThrow >= DOWN) {
+						params.theta = Math.PI/2;
+						params.phi = Math.PI/2;
+					} else {
+						params.theta = Math.PI/2;
+						params.phi = 3*Math.PI/2;
+					}
+
+				}
+
+				if(axis==2){
+					
+					var UP = math.pow(math.norm(math.dot(zUp,psi)),2);
+					var DOWN = math.pow(math.norm(math.dot(zDown,psi)),2);
+					var diceThrow = Math.random();
+
+					if (diceThrow >= DOWN) {
+						params.theta = 0;
+						params.phi = 0;
+					} else {
+						params.theta = Math.PI;
+						params.phi = 0;
+					}
+
+				}
+
+				
+				
+			}
+
+			function onDocumentMouseDown( event ) {
+				event.preventDefault();
+				mouseDown=true;
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = (- ( event.clientY / window.innerHeight) * 2 + 1);	
+				coors.x = params.theta;
+				coors.y = params.phi;						
+                // console.log("mouse x:"+mouse.x+", mouse y:"+mouse.y);
+
+                raycaster.setFromCamera( mouse, camera );
+               
+
+				var intersects = raycaster.intersectObjects( objects );
+
+				if(intersects.length > 0) {
+					controls.enabled = false;
+					stateMove = true;
+				}
+
+            }
+            function onDocumentMouseUp( event ) {
+				event.preventDefault();
+				mouseDown=false;
+				controls.enabled = true;
+				stateMove = false;
+
+            }
+            function onDocumentMouseMove( event ) {
+				event.preventDefault();
+				if(mouseDown){
+					var dx = ( event.clientX / window.innerWidth ) * 2 - 1 - mouse.x;
+					var dy = (- ( event.clientY / window.innerHeight) * 2 + 1) - mouse.y;
+
+					if(stateMove){
+						params.theta = (-dy*2 + coors.x);
+						if(params.theta>Math.PI) {params.theta=Math.PI;}
+						if(params.theta<0) {params.theta=0;}
+						params.phi = (dx*2 + coors.y)% (2*Math.PI) ;
+					}
+					
+				}
+
+            }
+			
+			function animate() {
+				requestAnimationFrame( animate );
+				render();
+			}
+
+
+			function render() {
+				// var focus = camera.position.length()
+
+				// Rotation(1,0.05);
+				// Rotation(2,0.01);
+
+				for (var i in axesLabels){
+					axesLabels[i].lookAt(camera.position);
+					// console.log(label);
+				}
+
+				state.position.set(Math.sin(params.theta)*Math.cos(-params.phi),
+				Math.cos(params.theta),
+				Math.sin(params.theta)*Math.sin(-params.phi));
+
+				psiGeo.vertices[1].set(Math.sin(params.theta)*Math.cos(-params.phi),
+				Math.cos(params.theta),
+				Math.sin(params.theta)*Math.sin(-params.phi));
+
+				psiGeo.verticesNeedUpdate = true;
+
+				//write the vector
+				state0_Re = Math.cos(params.theta/2);
+				state1_Re = Math.cos(-params.phi)*Math.sin(params.theta/2);
+				state1_Im = -Math.sin(-params.phi)*Math.sin(params.theta/2);
+
+
+				// effect.eyeSep(params.eyeSep);
+				// camera.focus = Math.abs(focus + params.focusOffset);
+				
+				document.getElementById("state0_Re").innerHTML = Math.round(state0_Re*100)/100;
+				document.getElementById("state1_Re").innerHTML = Math.round(state1_Re*100)/100;	
+				document.getElementById("state1_Im").innerHTML = Math.round(state1_Im*100)/100;	
+
+				effect.render( scene, camera );
+			}
+
+
+
+		</script>
+		<div style="position:absolute; top:0px; left:0px; width:200px;float:left">
+			<button style="width: 100%; border:0px">PREPARE STATE</button><br>
+
+
+			<button style="width: 33%" onclick="params.theta=0;params.phi=0;">$|0\rangle$
+			</button><button style="width: 33%" onclick="params.theta=Math.PI/2;params.phi=0;">$|+\rangle$
+			</button><button style="width: 33%" onclick="params.theta=Math.PI/2;params.phi=Math.PI/2;">$|u\rangle$
+			</button><br>
+			<button style="width: 33%" onclick="params.theta=Math.PI;params.phi=0;">$|1\rangle$
+			</button><button style="width: 33%" onclick="params.theta=Math.PI/2;params.phi=Math.PI;">$|-\rangle$
+			</button><button style="width: 33%" onclick="params.theta=Math.PI/2;params.phi=3*Math.PI/2;">$|d\rangle$
+			</button>
+
+			<button style="width: 100%; border:0px">MEASUREMENT</button><br>
+
+			<button style="width: 33%" onclick="Measure(0)">Along $X$
+			</button><button style="width: 33%" onclick="Measure(1)">Along $Y$
+			</button><button style="width: 33%" onclick="Measure(2)">Along $Z$</button><br>
+
+
+
+			<button style="width: 100%; border:0px">ROTATION</button><br>
+
+			<button style="width: 33%" onclick="Rotation(0,Math.PI/4)">$X^{-1/4}$
+			<button style="width: 33%" onclick="Rotation(1,-Math.PI/4)">$Y^{-1/4}$
+			</button><button style="width: 33%" onclick="Rotation(2,-Math.PI/4)">$Z^{-1/4}$
+			</button><br>
+
+
+			</button><button style="width: 33%" onclick="Rotation(0,Math.PI/2)">$X^{-1/2}$
+			<button style="width: 33%" onclick="Rotation(1,-Math.PI/2)">$Y^{-1/2}$
+			</button><button style="width: 33%" onclick="Rotation(2,-Math.PI/2)">$Z^{-1/2}$
+			</button><br>
+
+			</button><button style="width: 33%" onclick="Rotation(0,-Math.PI)">$X^1$
+			</button><button style="width: 33%" onclick="Rotation(1,Math.PI)">$Y^1$
+			</button><button style="width: 33%" onclick="Rotation(2,Math.PI)">$Z^1$
+			</button><br>
+
+			<button style="width: 33%" onclick="Rotation(0,-Math.PI/2)">$X^{1/2}$
+			</button><button style="width: 33%" onclick="Rotation(1,Math.PI/2)">$Y^{1/2}$
+			</button><button style="width: 33%" onclick="Rotation(2,Math.PI/2)">$Z^{1/2}$
+			</button><br>
+
+			<button style="width: 33%" onclick="Rotation(0,-Math.PI/4)">$X^{1/4}$
+			</button><button style="width: 33%" onclick="Rotation(1,Math.PI/4)">$Y^{1/4}$
+			</button><button style="width: 33%" onclick="Rotation(2,Math.PI/4)">$Z^{1/4}$</button><br>
+		
+			<button style="width: 100%; border:0px">OTHER GATES</button><br>
+
+			<button style="width: 50%" onclick="Hadamard()">Hadamard
+			</button>
+
+
+		</div>
+
+
+
+		<!-- <input type="button" style="z-index:2; position:absolute; top:200px; left:10px" value="Hadamard" onclick="Hadamard()"/> -->
+		
+
+		
+
+		
+	</body>
+</html>

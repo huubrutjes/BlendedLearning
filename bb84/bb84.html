@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+@media print {
+   body {
+      -webkit-print-color-adjust: exact;
+   }
+}
+
+body {
+			background-color:#FFFFFF;
+			padding:0;
+			margin:0;
+			overflow:hidden;
+			}
+			
+button  {
+    background-color: #ffffff;
+    border: 1px solid black;
+    border-radius: 10px;
+    color: black;
+    width: 70px;
+    padding: 0px;
+    height: 60px;
+    top: 0px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 36px;
+    position: absolute;
+    vertical-align: middle;
+}
+
+
+
+div.textLeft  {
+    border: 0px;
+    color: black;
+    width: 200px;
+    height: 80px;
+    top: 0px;
+    text-align: left;
+    padding-right: 20px;
+    vertical-align: middle;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+    position: absolute;
+    line-height: 80px;
+}
+
+div.bg {
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 800px;
+	height: 290px;
+	z-index: -2;
+	background-color: #ffffff;
+}
+
+img {
+	vertical-align:middle;
+}
+
+
+
+
+
+</style>
+</head>
+
+<body>
+
+<!-- <button id="bit0" onclick="bitClicked(this)">bit0</button> -->
+
+
+
+<script>
+
+var offset = 200;
+var btnWidth = 75;
+var rowHeight = 60;
+var stringAlice = [];
+var basisAlice = [];
+var basisEve = [];
+var messageAlice = [];
+var basisBob = [];
+var measureEve = [];
+var measureEveFlags = [];
+var messageEve = [];
+var n = 8;
+var basis = ["+","x"];
+
+
+var aliceBGDiv = document.createElement("div");
+aliceBGDiv.className = "bg";	
+aliceBGDiv.style.backgroundColor = "#efc0a0";
+document.body.appendChild(aliceBGDiv);
+
+var eveBGDiv = document.createElement("div");
+eveBGDiv.className = "bg";	
+eveBGDiv.style.backgroundColor = "#bae88d";
+eveBGDiv.style.top = 3*rowHeight + "px";
+eveBGDiv.style.height = 3*rowHeight + "px";
+document.body.appendChild(eveBGDiv);
+
+var bobBGDiv = document.createElement("div");
+bobBGDiv.className = "bg";	
+bobBGDiv.style.backgroundColor = "#abafdb";
+bobBGDiv.style.top = 6*rowHeight + "px";
+bobBGDiv.style.height = 3*rowHeight + "px";
+document.body.appendChild(bobBGDiv);
+
+
+var aliceStringDiv = document.createElement("div");
+aliceStringDiv.className = "textLeft";
+var t = document.createTextNode("Alice's String:");
+aliceStringDiv.appendChild(t);
+document.body.appendChild(aliceStringDiv);
+
+var aliceBasisDiv = document.createElement("div");
+aliceBasisDiv.className = "textLeft";
+var t = document.createTextNode("Alice's Basis:");
+aliceBasisDiv.appendChild(t);
+aliceBasisDiv.style.top = 1*rowHeight + "px";
+document.body.appendChild(aliceBasisDiv);
+
+var aliceMessageDiv = document.createElement("div");
+aliceMessageDiv.className = "textLeft";
+var t = document.createTextNode("Alice's Message:");
+aliceMessageDiv.appendChild(t);
+aliceMessageDiv.style.top = 2*rowHeight + "px";
+document.body.appendChild(aliceMessageDiv);
+
+var eveBasisDiv = document.createElement("div");
+eveBasisDiv.className = "textLeft";
+var t = document.createTextNode("Eve's Basis:");
+eveBasisDiv.appendChild(t);
+eveBasisDiv.style.top = 3*rowHeight + "px";
+document.body.appendChild(eveBasisDiv);
+
+var eveMeasDiv = document.createElement("div");
+eveMeasDiv.className = "textLeft";
+var t = document.createTextNode("Eve's Measurement:");
+eveMeasDiv.appendChild(t);
+eveMeasDiv.style.top = 4*rowHeight + "px";
+document.body.appendChild(eveMeasDiv);
+
+var eveMessageDiv = document.createElement("div");
+eveMessageDiv.className = "textLeft";
+var t = document.createTextNode("Eve's Message:");
+eveMessageDiv.appendChild(t);
+eveMessageDiv.style.top = 5*rowHeight + "px";
+document.body.appendChild(eveMessageDiv);
+
+var bobBasisDiv = document.createElement("div");
+bobBasisDiv.className = "textLeft";
+var t = document.createTextNode("Bob's Basis:");
+bobBasisDiv.appendChild(t);
+bobBasisDiv.style.top = 6*rowHeight + "px";
+document.body.appendChild(bobBasisDiv);
+
+var bobMeasDiv = document.createElement("div");
+bobMeasDiv.className = "textLeft";
+var t = document.createTextNode("Bob's Measurement:");
+bobMeasDiv.appendChild(t);
+bobMeasDiv.style.top = 7*rowHeight + "px";
+document.body.appendChild(bobMeasDiv);
+
+var agreedBasisDiv = document.createElement("div");
+agreedBasisDiv.className = "textLeft";
+var t = document.createTextNode("Shared Basis:");
+agreedBasisDiv.appendChild(t);
+agreedBasisDiv.style.top = 8*rowHeight + "px";
+document.body.appendChild(agreedBasisDiv);
+
+// var btn;
+
+// btn = document.createElement("BUTTON");
+// btn.id="removeQUBIT";
+// btn.className = "button";
+// btn.innerHTML = "-1";
+// btn.style.width="50px";
+// btn.style.fontSize = "24px";
+// btn.style.left = "0px";
+// btn.onclick = function(){
+// 	if(n>1){n-=1;removeLastQubit();}
+// 	return false;
+// };
+// document.body.appendChild(btn);
+
+// btn = document.createElement("BUTTON");
+// btn.id="addQUBIT";
+// btn.className = "button";
+// btn.innerHTML = "add Qubit";
+// btn.style.width="200px";
+// btn.style.fontSize = "24px";
+// btn.style.left = (550+n*100)+"px";
+// btn.onclick = function(){
+// 	if(n<10){n+=1;addQubit();}
+	
+// 	return false;
+// };
+// document.body.appendChild(btn);
+
+for(var i=0 ; i<n ; i++){
+	init(i);
+}
+
+function init(i){
+
+	//create Alice String
+	stringAlice[i] = Math.floor( Math.random() * 2 );
+	btn = document.createElement("BUTTON");
+	btn.id="btnStringAlice"+i;
+	btn.className = "button";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	btn.onclick = function(){
+		bitClicked(this.id);
+		return false;
+	};
+	document.body.appendChild(btn); 
+
+	//create Alice Basis
+	basisAlice[i] = basis[Math.floor( Math.random() * 2 )];
+	btn = document.createElement("BUTTON");
+	btn.id="btnBasisAlice"+i;
+	btn.className = "button";
+	btn.style.top = 1*rowHeight + "px";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	btn.onclick = function(){
+		basisAliceClicked(this.id);
+		return false;
+	};
+	document.body.appendChild(btn);
+
+	//create Alice Message
+	btn = document.createElement("button");
+	btn.id="messageAlice"+i;
+	btn.className = "button";
+	btn.style.top = 2*rowHeight + "px";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	document.body.appendChild(btn); 
+	messageEve[i] = "";
+
+	//create Eve Basis
+	basisEve[i] = basis[Math.floor( Math.random() * 2 )];
+	btn = document.createElement("BUTTON");
+	btn.id="btnBasisEve"+i;
+	btn.className = "button";
+	btn.style.top = 3*rowHeight + "px";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	btn.onclick = function(){
+		basisEveClicked(this.id);
+		return false;
+	};
+	document.body.appendChild(btn);
+
+	//create Eve Measurement
+	measureEveFlags[i] = false;
+	btn = document.createElement("BUTTON");
+	btn.id="btnMeasureEve"+i;
+	btn.className = "button";
+	btn.style.top = 4*rowHeight + "px";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	btn.onclick = function(){
+		measureEveClicked(this.id);
+		return false;
+	};
+	document.body.appendChild(btn);
+
+	//create Eve Measurement
+	btn = document.createElement("BUTTON");
+	btn.id="btnMessageEve"+i;
+	btn.className = "button";
+	btn.style.top = 5*rowHeight + "px";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	document.body.appendChild(btn);
+
+	//create Bob Basis
+	basisBob[i] = basis[Math.floor( Math.random() * 2 )];
+	btn = document.createElement("BUTTON");
+	btn.id="btnBasisBob"+i;
+	btn.className = "button";
+	btn.style.top = 6*rowHeight + "px";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	btn.onclick = function(){
+		basisBobClicked(this.id);
+		return false;
+	};
+	document.body.appendChild(btn);
+
+	//create Bob's Measurement
+	btn = document.createElement("button");
+	btn.id="measureBob"+i;
+	btn.className = "button";
+	btn.style.top = 7*rowHeight + "px";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	document.body.appendChild(btn); 
+
+	//create agreed upon basis
+	var btn = document.createElement("button");
+	btn.className = "button";
+	btn.id="sharedBasis"+i;
+	btn.style.top = 8*rowHeight + "px";
+	btn.style.left = (offset+i*btnWidth)+"px";
+	document.body.appendChild(btn); 
+
+	Update(i);
+
+}
+
+function removeLastQubit(){
+
+	elem = document.getElementById("btnStringAlice"+n);
+	elem.outerHTML = "";
+	delete elem;
+	elem = document.getElementById("btnBasisAlice"+n);
+	elem.outerHTML = "";
+	delete elem;
+	elem = document.getElementById("messageAlice"+n);
+	elem.outerHTML = "";
+	delete elem;
+	elem = document.getElementById("btnBasisEve"+n);
+	elem.outerHTML = "";
+	delete elem;
+	elem = document.getElementById("btnMeasureEve"+n);
+	elem.outerHTML = "";
+	delete elem;
+	elem = document.getElementById("btnMessageEve"+n);
+	elem.outerHTML = "";
+	delete elem;
+	elem = document.getElementById("btnBasisBob"+n);
+	elem.outerHTML = "";
+	delete elem;
+	elem = document.getElementById("measureBob"+n);
+	elem.outerHTML = "";
+	delete elem;
+	elem = document.getElementById("sharedBasis"+n);
+	elem.outerHTML = "";
+	delete elem;
+
+	aliceBGDiv.style.width = 300+n*100+"px";
+	eveBGDiv.style.width = 300+n*100+"px";
+	bobBGDiv.style.width = 300+n*100+"px";
+
+	document.getElementById("removeQUBIT").style.left = 350+n*100+"px";
+	document.getElementById("addQUBIT").style.left = 550+n*100+"px";
+}
+
+function addQubit(){
+
+	init(n-1);
+	aliceBGDiv.style.width = 300+n*100+"px";
+	eveBGDiv.style.width = 300+n*100+"px";
+	bobBGDiv.style.width = 300+n*100+"px";
+
+	document.getElementById("removeQUBIT").style.left = 350+n*100+"px";
+	document.getElementById("addQUBIT").style.left = 550+n*100+"px";
+}
+
+
+
+function bitClicked(id){
+	var nr = id.slice(-1);
+	stringAlice[nr] = (stringAlice[nr]+1)%2;
+
+	Update(nr);
+}
+
+function basisAliceClicked(id){
+	var nr = id.slice(-1);
+	if(basisAlice[nr]=="+"){basisAlice[nr]="x";} else {basisAlice[nr]="+";}
+	Update(nr);
+}
+
+function basisEveClicked(id){
+	var nr = id.slice(-1);
+	if(basisEve[nr]=="+"){basisEve[nr]="x";} else {basisEve[nr]="+";}
+	Update(nr);
+}
+
+function basisBobClicked(id){
+	var nr = id.slice(-1);
+	if(basisBob[nr]=="+"){basisBob[nr]="x";} else {basisBob[nr]="x";}
+	
+	Update(nr);
+}
+
+function measureEveClicked(id){
+	var nr = id.slice(-1);
+	if(measureEveFlags[nr]){measureEveFlags[nr]=false;} else {measureEveFlags[nr]=true;}
+	Update(nr);
+}
+
+function Update(i){
+	//update alice string button
+	document.getElementById("btnStringAlice"+i).innerHTML = stringAlice[i];
+
+	//update alice Basis
+	document.getElementById("btnBasisAlice"+i).innerHTML = basisAlice[i];
+
+	//update Alice Message
+	var state;
+	var elem = document.getElementById("messageAlice"+i);
+	if(elem.firstChild!=null) {elem.removeChild(elem.firstChild);}
+
+	var ket_0 = document.createElement("img");
+	ket_0.src = "images/ket_0.svg";
+	ket_0.width = 50;
+	var ket_1 = document.createElement("img");
+	ket_1.src = "images/ket_1.svg";
+	ket_1.width = 50;
+	var ket_plus = document.createElement("img");
+	ket_plus.src = "images/ket_plus.svg";
+	ket_plus.width = 50;
+	var ket_min = document.createElement("img");
+	ket_min.src = "images/ket_min.svg";
+	ket_min.width = 50;
+
+	if(stringAlice[i]==0 && basisAlice[i]=="+") {
+		state="|0>";
+		elem.appendChild(ket_0);
+	} else if(stringAlice[i]==1 && basisAlice[i]=="+") {
+		state="|1>";
+		elem.appendChild(ket_1);
+	} else if(stringAlice[i]==0 && basisAlice[i]=="x") {
+		state="|+>";
+		elem.appendChild(ket_plus);
+	} else if(stringAlice[i]==1 && basisAlice[i]=="x") {
+		state="|->";
+		elem.appendChild(ket_min);
+	} 
+	messageAlice[i] = state;
+
+
+	//update Eve's Basis
+	document.getElementById("btnBasisEve"+i).innerHTML = basisEve[i];
+	
+	//update Eve's measurement
+	if(measureEveFlags[i]){
+		var result;
+		if(messageAlice[i]=="|0>" && basisEve[i]=="+") {
+			result = 0;
+		} else if(messageAlice[i]=="|1>" && basisEve[i]=="+") {
+			result = 1;
+		} else if(messageAlice[i]=="|+>" && basisEve[i]=="x") {
+			result=0;
+		} else if(messageAlice[i]=="|->" && basisEve[i]=="x") {
+			result=1;
+		} else {
+			result=Math.floor( Math.random() * 2 );
+		}
+		document.getElementById("btnMeasureEve"+i).innerHTML = result;
+
+		var ket_0 = document.createElement("img");
+		ket_0.src = "images/ket_0.svg";
+		ket_0.width = 50;
+		var ket_1 = document.createElement("img");
+		ket_1.src = "images/ket_1.svg";
+		ket_1.width = 50;
+		var ket_plus = document.createElement("img");
+		ket_plus.src = "images/ket_plus.svg";
+		ket_plus.width = 50;
+		var ket_min = document.createElement("img");
+		ket_min.src = "images/ket_min.svg";
+		ket_min.width = 50;
+
+		var elem = document.getElementById("btnMessageEve"+i);
+		if(elem.firstChild!=null) {elem.removeChild(elem.firstChild);}
+
+		if(result == 0 && basisEve[i]=="+"){
+			messageEve[i] = "|0>";
+			elem.appendChild(ket_0);
+		} else if(result == 1 && basisEve[i]=="+"){
+			messageEve[i] = "|1>";
+			elem.appendChild(ket_1);
+		} else if(result == 0 && basisEve[i]=="x"){
+			messageEve[i] = "|+>";
+			elem.appendChild(ket_plus);
+		} else if(result == 1 && basisEve[i]=="x"){
+			messageEve[i] = "|->";
+			elem.appendChild(ket_min);
+		}
+
+
+		} else {
+			document.getElementById("btnMeasureEve"+i).innerHTML = "";
+			document.getElementById("btnMessageEve"+i).innerHTML = "";
+	}	
+	
+
+	//update Bob's Basis
+	document.getElementById("btnBasisBob"+i).innerHTML = basisBob[i];
+
+	//update bob's measurement
+	if(measureEveFlags[i]){
+		var message = messageEve[i];
+	} else {
+		var message = messageAlice[i];
+	}
+	var result;
+	if(message=="|0>" && basisBob[i]=="+") {
+		result = 0;
+	} else if(message=="|1>" && basisBob[i]=="+") {
+		result = 1;
+	} else if(message=="|+>" && basisBob[i]=="x") {
+		result=0;
+	} else if(message=="|->" && basisBob[i]=="x") {
+		result=1;
+	} else {
+		result=Math.floor( Math.random() * 2 );
+	}
+	var elem = document.getElementById("measureBob"+i);
+
+	if(result!=stringAlice[i] && basisBob[i]==basisAlice[i]) {elem.innerHTML = result + "(!)" ;} else {elem.innerHTML = result;}
+
+
+	//update shared basis
+	var id = "sharedBasis"+i;
+	var id2 = "measureBob"+i;
+	var id3 = "btnStringAlice" + i;
+	var share;
+	if(basisAlice[i]==basisBob[i]) {
+		share = "yes";
+		document.getElementById(id).style.backgroundColor = "#00ff00";
+		document.getElementById(id2).style.backgroundColor = "#00ff00";
+		document.getElementById(id3).style.backgroundColor = "#00ff00";
+	} else {
+		share = "no";
+		document.getElementById(id).style.backgroundColor = "#ff0000";
+		document.getElementById(id2).style.backgroundColor = "#ffffff";
+		document.getElementById(id3).style.backgroundColor = "#ffffff";
+	}
+	document.getElementById(id).innerHTML = share ;
+}
+
+
+
+
+
+
+</script>
+
+</body>
+</html>
