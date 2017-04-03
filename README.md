@@ -22,13 +22,19 @@ You can see an example of the tool here: https://staff.fnwi.uva.nl/h.rutjes/Inte
 
 ## Interactive Bloch sphere
 
+**Folder: blochsphere**
+
 This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the THREEJS library. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/blochsphere.htm
 
 ## Interactive BB84 Protocol
 
+**Folder: bb84**
+
 This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and CSS styling. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/BB84.html
 
 ## Interactive quantum measurement in the Two Point quantum world
+
+**Folder: twopointworld**
 
 This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the jsxgraph library. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/TwoPointWorld.html
 
