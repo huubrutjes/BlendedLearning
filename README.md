@@ -38,6 +38,12 @@ Folder: [twopointworld](/twopointworld/)
 
 This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the jsxgraph library. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/TwoPointWorld.html
 
+## Interactive graph of Rabi oscillation
+
+Folder: [rabi-oscillations](/rabi-oscillations/)
+
+This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the jsxgraph library. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/rabi-oscillations.html
+
 ## Interactive adding of vector in 3-space
 
 This interactive applet was made as a proof-of-concept. It uses Javascript and the THREEJS library. It shows two vectors and the result of adding them. The two initial vectors can be manipulated by the user. A virtual camera can be used to move through space. You can find the applet here: https://staff.fnwi.uva.nl/h.rutjes/applets/interactiveLA.htm
