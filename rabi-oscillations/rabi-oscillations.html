@@ -1,0 +1,107 @@
+<html>
+<head>
+  <title>Example</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>
+   <link rel='stylesheet' type='text/css' href='https://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css' />
+
+
+	<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+	<style>
+
+		body {
+			background:#FFFFFF;
+			padding:0;
+			margin:0;
+			overflow:hidden;
+			}
+
+	</style>
+
+</head>
+    
+    
+<body>
+    
+<div id="box" class="jxgbox" style="width:800px; height:450px;"></div>
+
+<script type="text/javascript">
+    JXG.Options.text.fontSize = 20; 
+    var brd = JXG.JSXGraph.initBoard('box', 
+    {boundingbox: [-1, 1.1, 11, -0.3], 
+     axis:false,
+     showCopyright:false,
+     showNavigation:false,
+    zoom: {
+	  factorX:1.25,
+	  factorY:1.25,
+	  wheel:true,
+	  needshift:true,
+	  eps: 0.1
+	 }
+    });
+    
+    
+    a = brd.create('slider',[[0.2,-0.2],[6,-0.2],[0,1,10]], {name:'Delta E (eV)'});
+    
+    brd.containerObj.style.backgroundColor = 'white';
+    brd.containerObj.style.border = 'none';
+    brd.options.label.strokeColor = 'black';
+
+    f1 = brd.create('functiongraph',[function(x){
+            return Math.pow(Math.cos(a.Value()*x / (2*0.658)),2)} , 0,15],
+                   {
+	strokeColor:'#F00',highlight:true
+	}) ;
+    
+    f2 = brd.create('functiongraph',[function(x){
+            return Math.pow(Math.sin(a.Value()*x / (2*0.658)),2)}  , 0,15]) ;
+    
+    
+    xaxis = brd.create('axis', [[0, 0], [1,0]], 
+		  {name:'t ', 
+			withLabel: true, 
+			label: {position: 'rt',  // possible values are 'lft', 'rt', 'top', 'bot'
+					 offset: [-2, 20]   // (in pixels)
+					 }
+			});
+    
+    xaxis.removeAllTicks();
+    brd.create('ticks', [xaxis, 2], { // The number here is the distance between Major ticks
+        strokeColor:'#ccc',
+        majorHeight:-1, // Need this because the JXG.Options one doesn't apply
+        drawLabels:true, // Needed, and only works for equidistant ticks
+        label: {offset: [-15, -15]},
+        minorTicks:5, // The NUMBER of small ticks between each Major tick
+        drawZero:true,
+        scaleSymbol: ' fs'
+    }
+    );
+    
+    yaxis = brd.create('axis', [[0, 0], [0, 1]], 
+		  {name:'P', 
+			withLabel: true, 
+			label: {
+			  position: 'rt',  // possible values are 'lft', 'rt', 'top', 'bot'
+			  offset: [-20, 0]   // (in pixels)
+				}
+			});
+    
+    yaxis.removeAllTicks();
+    brd.create('ticks', [yaxis, 1], { // The number here is the distance between Major ticks
+        strokeColor:'#ccc',
+        majorHeight:-1, // Need this because the JXG.Options one doesn't apply
+        drawLabels:true, // Needed, and only works for equidistant ticks
+        label: {offset: [-0, -0]},
+        minorTicks:5, // The NUMBER of small ticks between each Major tick
+        drawZero:true
+    }
+    );
+
+
+</script>
+
+
+</body>
+</html>
