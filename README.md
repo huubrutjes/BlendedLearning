@@ -24,25 +24,25 @@ You can see an example of the tool here: https://staff.fnwi.uva.nl/h.rutjes/Inte
 
 Folder: [blochsphere](/blochsphere/)
 
-This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the THREEJS library. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/blochsphere.htm
+This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the THREEJS library. The applet can be found here: https://esc.fnwi.uva.nl/blend/qc/applets/blochsphere/blochsphere.html
 
 ## Interactive BB84 Protocol
 
 Folder: [bb84](/bb84/)
 
-This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and CSS styling. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/BB84.html
+This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and CSS styling. The applet can be found here: https://esc.fnwi.uva.nl/blend/qc/applets/bb84/bb84.html
 
 ## Interactive quantum measurement in the Two Point quantum world
 
 Folder: [twopointworld](/twopointworld/)
 
-This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the jsxgraph library. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/TwoPointWorld.html
+This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the jsxgraph library. The applet can be found here: https://esc.fnwi.uva.nl/blend/qc/applets/twopointworld/twopointworld.html
 
 ## Interactive graph of Rabi oscillation
 
 Folder: [rabi-oscillations](/rabi-oscillations/)
 
-This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the jsxgraph library. The applet can be found here: https://staff.fnwi.uva.nl/h.rutjes/applets/rabi-oscillations.html
+This interactive applet was made for a first-year course about Quantum Computing. It uses Javascript and the jsxgraph library. The applet can be found here: https://esc.fnwi.uva.nl/blend/qc/applets/rabi-oscillations/rabi-oscillations.html
 
 ## Interactive adding of vector in 3-space
 
