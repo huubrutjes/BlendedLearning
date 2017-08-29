@@ -1,0 +1,129 @@
+<html>
+<head>
+  <title>Example</title>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jsxgraph/0.99.3/jsxgraphcore.js"></script>
+   <link rel='stylesheet' type='text/css' href='https://jsxgraph.uni-bayreuth.de/distrib/jsxgraph.css' />
+
+
+	<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+	<style>
+
+		body {
+			background:#FFFFFF;
+			padding:0;
+			margin:0;
+			overflow:hidden;
+			}
+
+	</style>
+
+</head>
+    
+    
+<body>
+    
+<div id="box" class="jxgbox" style="width:800px; height:450px;"></div>
+
+<script type="text/javascript">
+    JXG.Options.text.fontSize = 20; 
+    var brd = JXG.JSXGraph.initBoard('box', 
+    {boundingbox: [-20, 1.5, 20, -1.5], 
+     axis:false,
+     showCopyright:false,
+     showNavigation:true,
+    zoom: {
+	  factorX:1.25,
+	  factorY:1.25,
+	  wheel:true,
+	  needshift:true,
+	  eps: 0.1
+	 }
+    });
+    
+    var fac = [1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600, 6227020800, 87178291200, 1307674368000, 20922789888000, 355687428096000, 6402373705728000, 121645100408832000, 2432902008176640000];
+    
+    n = brd.create('slider',[[-15,-1.2],[10,-1.2],[0,1,20]], {snapWidth: 1 ,name:'n'});
+    a = brd.create('slider',[[-15,-1.0],[10,-1.0],[-10,0,10]], {name:'a'});
+    
+    brd.containerObj.style.backgroundColor = 'white';
+    brd.containerObj.style.border = 'none';
+    brd.options.label.strokeColor = 'black';
+
+    
+    f0 = brd.create('functiongraph',[function(x){
+            return Math.sin(x)} ],
+                   {
+	strokeColor:'#00F',highlight:true
+	}) ;
+    
+    f1 = brd.create('functiongraph',[function(x){
+            var f=0;
+            var A;
+            for (var i=0 ; i<n.Value()+1 ; i++) {
+                if(i%2==0) {
+                    if((i/2)%2==0) {A=+1;} else {A=-1;}
+                    f+= A*Math.sin(a.Value())*Math.pow(x-a.Value(),i) / fac[i]; 
+                } else {
+                    if(((i+1)/2)%2==0) {A=-1;} else {A=1;}
+                    f+= A*Math.cos(a.Value())*Math.pow(x-a.Value(),i) / fac[i]; 
+                }
+            }
+            return f} ],
+                   {
+	strokeColor:'#F00',highlight:true
+	}) ;
+    
+    
+    
+    xaxis = brd.create('axis', [[-20, 0], [20,0]], 
+		  {name:'x ', 
+			withLabel: true, 
+			label: {position: 'rt',  // possible values are 'lft', 'rt', 'top', 'bot'
+					 offset: [-2, 20]   // (in pixels)
+					 }
+			});
+    
+//    xaxis.removeAllTicks();
+//    brd.create('ticks', [xaxis, 2], { // The number here is the distance between Major ticks
+//        strokeColor:'#ccc',
+//        majorHeight:-1, // Need this because the JXG.Options one doesn't apply
+//        drawLabels:true, // Needed, and only works for equidistant ticks
+//        label: {offset: [-15, -15]},
+//        minorTicks:5, // The NUMBER of small ticks between each Major tick
+//        drawZero:true,
+//        scaleSymbol: ' fs'
+//    }
+//    );
+    
+    yaxis = brd.create('axis', [[0, -1.5], [0, 1.5]], 
+		  {name:'y', 
+			withLabel: true, 
+			label: {
+			  position: 'rt',  // possible values are 'lft', 'rt', 'top', 'bot'
+			  offset: [-20, 0]   // (in pixels)
+				}
+			});
+//    
+//    yaxis.removeAllTicks();
+//    brd.create('ticks', [yaxis, 1], { // The number here is the distance between Major ticks
+//        strokeColor:'#ccc',
+//        majorHeight:-1, // Need this because the JXG.Options one doesn't apply
+//        drawLabels:true, // Needed, and only works for equidistant ticks
+//        label: {offset: [-0, -0]},
+//        minorTicks:5, // The NUMBER of small ticks between each Major tick
+//        drawZero:true
+//    }
+//    );
+    
+    function Series(x0) {
+        return Math.sin(x);
+    }
+
+
+</script>
+
+
+</body>
+</html>
